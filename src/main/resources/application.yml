@@ -1,0 +1,60 @@
+server:
+  port: ${PORT:8762}
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: clinic-gateway-service
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+eureka:
+  instance:
+    hostname: ${HOST_NAME}
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://user:password@localhost:8761}/eureka/
+
+zuul:
+  ignoredServices: "*"
+  routes:
+    patient:
+      path: /patient/**
+      serviceId: clinic-patient-service
+    doctor:
+      path: /doctor/**
+      serviceId: clinic-doctor-service
+    appointment:
+      path: /appointment/**
+      serviceId: clinic-appointment-service
+      sensitiveHeaders: Cookie, Set-Cookie
+    auth:
+      path: /auth/**
+      serviceId: clinic-auth-service
+  prefix: /api
+  ribbon:
+    eager-load:
+      enabled: true
+
+app:
+  tokenSecret: ${TOKEN_SECRET}
+  tokenExpirationMs: ${TOKEN_EXPIRATION}
+
+ribbon:
+  eureka:
+    enabled: true
+  ConnectTimeout: 5000
+  ReadTimeout: 15000
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 40000
